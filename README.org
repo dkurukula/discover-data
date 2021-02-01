@@ -1,0 +1,19 @@
+#+TITLE:   Discover Data
+#+DATE:    February 1, 2021
+
+* Table of Contents :TOC_3:noexport:
+- [[#description][Description]]
+  - [[#maintainers][Maintainers]]
+- [[#features][Features]]
+
+* Description
+
++ A visualization based open data disovery tool
+
+** Maintainers
++ @dkurukula (Author)
++ Michael Rogers
+
+* Features
++ D3 based web visualization
++ Srappers of open data catelogues
