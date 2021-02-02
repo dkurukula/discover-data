@@ -5,6 +5,9 @@
 - [[#description][Description]]
   - [[#maintainers][Maintainers]]
 - [[#features][Features]]
+- [[#data-sources][Data Sources]]
+- [[#progress][Progress]]
+  - [[#tasks-01][Tasks]]
 
 * Description
 
@@ -17,3 +20,10 @@
 * Features
 + D3 based web visualization
 + Srappers of open data catelogues
+  
+* Data Sources
++ [[open.toronto.ca/catalogue][Toronto Open Data]]
+
+* Progress
+** Tasks [0/1]
++ [ ] scrapper for Toronto
