@@ -19,7 +19,7 @@
 
 * Features
 + D3 based web visualization
-+ Srappers of open data catelogues
++ Srappers of open data catalogues
   
 * Data Sources
 + [[open.toronto.ca/catalogue][Toronto Open Data]]
