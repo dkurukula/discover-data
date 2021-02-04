@@ -8,6 +8,9 @@
 - [[#data-sources][Data Sources]]
 - [[#progress][Progress]]
   - [[#tasks-01][Tasks]]
+- [[#contributing][Contributing]]
+  - [[#dependencies][Dependencies]]
+  - [[#scrape][Scrape]]
 
 * Description
 
@@ -27,3 +30,19 @@
 * Progress
 ** Tasks [0/1]
 + [ ] scrapper for Toronto
+
+* Contributing
+** Dependencies
++ Python3.9+
+** Scrape
+Scrape data catalogues.  Scraping is all done in python.
+
+Setup virtual environment and install dependencies
+#+BEGIN_SRC shell
+cd scrape
+python3.9 -m venv .venv
+source .venv/bin/activate
+python -m pip install pip --upgrade
+python -m pip install -r requirements.txt
+#+END_SRC
+substitute python3.9 with python3 if version is 3.9
