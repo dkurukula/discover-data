@@ -7,10 +7,11 @@
 - [[#features][Features]]
 - [[#data-sources][Data Sources]]
 - [[#progress][Progress]]
-  - [[#tasks-01][Tasks]]
+  - [[#tasks-13][Tasks]]
 - [[#contributing][Contributing]]
   - [[#dependencies][Dependencies]]
   - [[#scrape][Scrape]]
+  - [[#explore][Explore]]
 
 * Description
 
@@ -28,8 +29,10 @@
 + [[open.toronto.ca/catalogue][Toronto Open Data]]
 
 * Progress
-** Tasks [0/1]
-+ [ ] scrapper for Toronto
+** Tasks [1/3]
++ [X] scrape Toronto data catalogue
++ [ ] explore Toronto data catalogue
++ [ ] create d3 visualization
 
 * Contributing
 ** Dependencies
@@ -46,3 +49,18 @@ python -m pip install pip --upgrade
 python -m pip install -r requirements.txt
 #+END_SRC
 substitute python3.9 with python3 if version is 3.9
+** Explore
+Explore data catalogue in json format to determine what's useful to extract and display
+
+Setup basic node project with nodemon
+
+Ensure nodemon is installed on the system
+#+BEGIN_SRC shell
+sudo npm install -g nodemon
+#+END_SRC
+
+Run nodemon, in seperate terminal window/pane/buffer/process
+#+BEGIN_SRC shell
+cd explore
+nodemon toronto-explore.js
+#+END_SRC
