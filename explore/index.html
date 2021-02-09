@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Explore Toronto Data </title>
+    <meta name="Visually filter and discover Toronto datasets" content="Explore Toronto Data">
+
+    <link rel="stylesheet" href="css/styles.css">
+
+  </head>
+  <body>
+    <div id="topics"></div>
+    <div id="formats"></div>
+    <div id="cat"></div>
+    <div id="rate"></div>
+    <div id="div"></div>
+    <div id="title"></div>
+    <script>
+      const getAllSingle = (d, key) => {
+          let dk = d[`${key}`];
+          let dk = dk ? dk: "";
+          return dk
+      }
+
+      const dataset = d3.json("tor-dat.json")
+      dataset.then( (data) => {
+          data.forEach( (d) => {
+              d.topics = getAllSingle('topics')
+          })                  
+      })
+    </script>
+  </body>
+</html>
