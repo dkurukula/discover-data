@@ -33,13 +33,16 @@ const getAllSingle= (data, key) => {
 	return unique
 }
 
+const logdata = (key, data, func) => {
+	console.log(`\n\n${key} ------\n`, func(data,key))
+}
+
 let data = JSON.parse(fsdata.toString())
 let keys = topKeys(data)
 
-console.log(getAllCommaList(data,'topics'))
-console.log(getAllCommaList(data,'formats'))
-console.log(getAllSingle(data,'dataset_category'))
-console.log(getAllSingle(data,'refresh_rate'))
-console.log(getAllSingle(data,'owner_division'))
-console.log(getAllSingle(data,'title'))
-console.log(getAllSingle(data,'url'))
+logdata('topics', data, getAllCommaList)
+logdata('formats', data, getAllCommaList)
+logdata('dataset_category', data, getAllSingle)
+logdata('refresh_rate', data, getAllSingle)
+logdata('owner_division', data, getAllSingle)
+logdata('title', data, getAllSingle)
