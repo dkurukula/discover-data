@@ -14,29 +14,98 @@
 
 <body>
   <div id="test"></div>
+  <div id="cbox1">
+    <div>
+      <a class='reset'
+         href='javascript:cbox1.filterAll();dc.redrawAll();'
+         style='visibility: hidden;'>reset</a>
+    </div>
+  </div>
+  <div id="cbox2">
+    <div>
+      <a class='reset'
+         href='javascript:cbox1.filterAll();dc.redrawAll();'
+         style='visibility: hidden;'>reset</a>
+    </div>
+  </div>
+  <div style="clear: both"></div>
+<div id="datatable"></div>
   <script>
+JSON.flatten = function(data) {
+    var result = {};
+    function recurse (cur, prop) {
+        if (Object(cur) !== cur) {
+            result[prop] = cur;
+        } else if (Array.isArray(cur)) {
+             for(var i=0, l=cur.length; i<l; i++)
+                 recurse(cur[i], prop ? prop+"."+i : ""+i);
+            if (l == 0)
+                result[prop] = [];
+        } else {
+            var isEmpty = true;
+            for (var p in cur) {
+                isEmpty = false;
+                recurse(cur[p], prop ? prop+"."+p : p);
+            }
+            if (isEmpty)
+                result[prop] = {};
+        }
+    }
+    recurse(data, "");
+    return result;
+}
+
+
+
     var chart = dc.barChart("#test");
+    var cbox1 = new dc.CboxMenu('#cbox1'),
+        cbox2 = new dc.CboxMenu('#cbox2'),
+        datatable = new dc.DataTable('#datatable');
+
     d3.json("tor-dat.json").then((data) => {
       data.forEach(x => {
         x.num_tags = +x.num_tags;
+        x.refresh_rate = `${x.refresh_rate}`;
+        x.formats = `${x.formats}`;
       });
       var ndx = crossfilter(data),
-        dimNumTags = ndx.dimension(d => +d.num_tags),
-        groupNumTags = dimNumTags.group().reduceSum(d => +d.num_tags );
+        runDimension = ndx.dimension(d => +d.num_tags),
+        speedSumGroup = runDimension.group().reduceSum(d => +d.num_tags )
+
+        dimRefreshRate = ndx.dimension(d => d.refresh_rate);
+        dimFormats= ndx.dimension(d => d.formats);
 
       chart
         .width(768)
         .height(480)
         .x(d3.scaleLinear().domain([6,20]))
         .brushOn(false)
-        .dimension(dimNumTags)
-        .group(groupNumTags)
+        .dimension(runDimension)
+        .group(speedSumGroup)
         .on('renderlet', (chart) => {
           chart.selectAll('rect').on("click", (d) => {
             console.log("click!", d);
           });
         });
       chart.render();
+
+      cbox1
+        .dimension(dimRefreshRate)
+        .group(dimRefreshRate.group())
+        .controlsUseVisibility(true);
+      cbox2
+        .dimension(dimFormats)
+        .group(dimFormats.group())
+        .controlsUseVisibility(true);
+
+    datatable
+        .dimension(dimRefreshRate)
+        .section(d => `${d.refresh_rate}`)
+        .columns(['title', 'topics'])
+        .size(data.length);
+
+    dc.renderAll();
+
     });
   </script>
   </body>
