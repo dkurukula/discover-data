@@ -7,9 +7,12 @@ const datafp = "./explore/tor-dat.json"
 const port = 3000
 
 app.get('/', (req, res) => {
-	fs.readFileSync(datafp, (err, json) => {
-		let o = JSON.parse(json);
-		res.json(o);
+	console.log('begin fs read')
+	fs.readFile(datafp,'utf8', (err, json) => {
+		if (err) {
+			throw err
+		}
+		res.send(JSON.parse(json));
 	})
 })
 
