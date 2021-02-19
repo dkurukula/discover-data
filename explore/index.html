@@ -8,28 +8,17 @@
   <script src="https://unpkg.com/dc@4/dist/dc.js"></script>
   <script src="https://rawgit.com/crossfilter/reductio/master/reductio.js"></script>
   <script src="https://npmcdn.com/universe@latest/universe.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
   <style>
   </style>
 </head>
 
 <body>
+		<div class="container">
   <div id="test"></div>
-  <div id="cbox1">
-    <div>
-      <a class='reset'
-         href='javascript:cbox1.filterAll();dc.redrawAll();'
-         style='visibility: hidden;'>reset</a>
-    </div>
-  </div>
-  <div id="cbox2">
-    <div>
-      <a class='reset'
-         href='javascript:cbox1.filterAll();dc.redrawAll();'
-         style='visibility: hidden;'>reset</a>
-    </div>
-  </div>
   <div style="clear: both"></div>
-<div id="datatable"></div>
+	<div id="datatable"></div>
+	</div>
   <script>
 JSON.flatten = function(data) {
     var result = {};
