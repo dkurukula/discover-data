@@ -57,9 +57,7 @@ JSON.flatten = function(data) {
 
 
 
-    var chart = dc.barChart("#test");
-    var cbox1 = new dc.CboxMenu('#cbox1'),
-        cbox2 = new dc.CboxMenu('#cbox2'),
+    var chart = dc.barChart("#test"),
         datatable = new dc.DataTable('#datatable');
 
     d3.json("tor-dat.json").then((data) => {
@@ -75,29 +73,29 @@ JSON.flatten = function(data) {
         dimRefreshRate = ndx.dimension(d => d.refresh_rate);
         dimFormats= ndx.dimension(d => d.formats);
 
+const getAllSingle= (data, key) => {
+	let all = data.map( d => {
+		let dk = d[`${key}`]
+		if (dk == null){ return "" } else { return dk }
+	})
+	let unique = [...new Set(all.flat())].filter( x => x !== "")
+	return unique
+}
+
+ let allRefreshRates = getAllSingle(data,'refresh_rate')
+
       chart
         .width(768)
         .height(480)
-        .x(d3.scaleLinear().domain([6,20]))
+	.x(d3.scaleBand())
+	.xUnits(dc.units.ordinal)
         .brushOn(false)
-        .dimension(numTagsDim)
-        .group(numTagsSumGroup)
-	.xAxisLabel("Number of Tags")
-        .on('renderlet', (chart) => {
-          chart.selectAll('rect').on("click", (d) => {
-            console.log("click!", d);
-          });
-        });
-      chart.render();
-
-      cbox1
         .dimension(dimRefreshRate)
+	.barPadding(0.1)
+	.outerPadding(.05)
         .group(dimRefreshRate.group())
-        .controlsUseVisibility(true);
-      cbox2
-        .dimension(dimFormats)
-        .group(dimFormats.group())
-        .controlsUseVisibility(true);
+	.xAxisLabel("Data update frequency")
+      chart.render();
 
     datatable
         .dimension(dimRefreshRate)
