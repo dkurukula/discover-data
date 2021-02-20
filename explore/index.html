@@ -15,74 +15,75 @@
 
 <body>
 		<div class="container">
-  <div id="test"></div>
-  <div style="clear: both"></div>
-	<div id="datatable"></div>
-	</div>
-  <script>
-JSON.flatten = function(data) {
-    var result = {};
-    function recurse (cur, prop) {
-        if (Object(cur) !== cur) {
-            result[prop] = cur;
-        } else if (Array.isArray(cur)) {
-             for(var i=0, l=cur.length; i<l; i++)
-                 recurse(cur[i], prop ? prop+"."+i : ""+i);
-            if (l == 0)
-                result[prop] = [];
-        } else {
-            var isEmpty = true;
-            for (var p in cur) {
-                isEmpty = false;
-                recurse(cur[p], prop ? prop+"."+p : p);
-            }
-            if (isEmpty)
-                result[prop] = {};
-        }
-    }
-    recurse(data, "");
-    return result;
-}
+				<div id="freq"></div>
+				<br>
+				<div style="clear: both"></div>
+				<div id="datatable" class="table"></div>
+		</div>
+		<script>
+				JSON.flatten = function(data) {
+						var result = {};
+						function recurse (cur, prop) {
+								if (Object(cur) !== cur) {
+										result[prop] = cur;
+								} else if (Array.isArray(cur)) {
+										for(var i=0, l=cur.length; i<l; i++)
+												recurse(cur[i], prop ? prop+"."+i : ""+i);
+										if (l == 0)
+												result[prop] = [];
+								} else {
+										var isEmpty = true;
+										for (var p in cur) {
+												isEmpty = false;
+												recurse(cur[p], prop ? prop+"."+p : p);
+										}
+										if (isEmpty)
+												result[prop] = {};
+								}
+						}
+						recurse(data, "");
+						return result;
+				}
 
 
 
-    var chart = dc.barChart("#test"),
-        datatable = new dc.DataTable('#datatable');
+var chart = dc.barChart("#freq"),
+		datatable = new dc.DataTable('#datatable');
 
-    d3.json("tor-dat.json").then((data) => {
-      data.forEach(x => {
-        x.num_tags = +x.num_tags;
-        x.refresh_rate = `${x.refresh_rate}`;
-        x.formats = `${x.formats}`;
-      });
-      var ndx = crossfilter(data),
-        numTagsDim = ndx.dimension(d => +d.num_tags),
-        numTagsSumGroup = numTagsDim.group().reduceSum(d => +d.num_tags )
+d3.json("tor-dat.json").then((data) => {
+		data.forEach(x => {
+				x.num_tags = +x.num_tags;
+				x.refresh_rate = `${x.refresh_rate}`;
+				x.formats = `${x.formats}`;
+		});
+		var ndx = crossfilter(data),
+				numTagsDim = ndx.dimension(d => +d.num_tags),
+				numTagsSumGroup = numTagsDim.group().reduceSum(d => +d.num_tags )
 
-        dimRefreshRate = ndx.dimension(d => d.refresh_rate);
-        dimFormats= ndx.dimension(d => d.formats);
+		dimRefreshRate = ndx.dimension(d => d.refresh_rate);
+		dimFormats= ndx.dimension(d => d.formats);
 
-      chart
-        .width(768)
-        .height(480)
-	.x(d3.scaleBand())
-	.xUnits(dc.units.ordinal)
-        .brushOn(false)
-        .dimension(dimRefreshRate)
-	.barPadding(0.1)
-	.outerPadding(.05)
-        .group(dimRefreshRate.group())
-	.xAxisLabel("Data update frequency")
-      chart.render();
+		chart
+				.width(768)
+				.height(480)
+				.x(d3.scaleBand())
+				.xUnits(dc.units.ordinal)
+				.brushOn(false)
+				.dimension(dimRefreshRate)
+				.barPadding(0.1)
+				.outerPadding(.05)
+				.group(dimRefreshRate.group())
+				.xAxisLabel("Data update frequency")
+		chart.render();
 
-    datatable
-        .dimension(dimRefreshRate)
-        .section(d => `${d.refresh_rate}`)
-        .columns(['title', 'topics'])
-        .size(data.length);
+		datatable
+				.dimension(dimRefreshRate)
+				.section(d => `${d.refresh_rate}`)
+				.columns(['title', 'topics'])
+				.size(data.length);
 
-    dc.renderAll();
+		dc.renderAll();
 
-    });
-  </script>
-  </body>
+});
+		</script>
+</body>
