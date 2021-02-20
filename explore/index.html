@@ -62,17 +62,6 @@ JSON.flatten = function(data) {
         dimRefreshRate = ndx.dimension(d => d.refresh_rate);
         dimFormats= ndx.dimension(d => d.formats);
 
-const getAllSingle= (data, key) => {
-	let all = data.map( d => {
-		let dk = d[`${key}`]
-		if (dk == null){ return "" } else { return dk }
-	})
-	let unique = [...new Set(all.flat())].filter( x => x !== "")
-	return unique
-}
-
- let allRefreshRates = getAllSingle(data,'refresh_rate')
-
       chart
         .width(768)
         .height(480)
