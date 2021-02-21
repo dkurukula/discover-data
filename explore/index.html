@@ -1,88 +1,149 @@
 
 <!DOCTYPE html>
 <head>
-  <meta charset="utf-8">
-  <link rel="stylesheet" type="text/css" href="https://unpkg.com/dc@4/dist/style/dc.css" />
-  <script src="https://unpkg.com/d3@5/dist/d3.js"></script>
-  <script src="https://unpkg.com/crossfilter2@1.5/crossfilter.js"></script>
-  <script src="https://unpkg.com/dc@4/dist/dc.js"></script>
-  <script src="https://rawgit.com/crossfilter/reductio/master/reductio.js"></script>
-  <script src="https://npmcdn.com/universe@latest/universe.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
-  <style>
-  </style>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/dc@4/dist/style/dc.css" />
+<script src="https://unpkg.com/d3@5/dist/d3.js"></script>
+<script src="https://unpkg.com/crossfilter2@1.5/crossfilter.js"></script>
+<script src="https://unpkg.com/dc@4/dist/dc.js"></script>
+<script src="https://rawgit.com/crossfilter/reductio/master/reductio.js"></script>
+<script src="https://npmcdn.com/universe@latest/universe.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+<style>
+</style>
 </head>
 
 <body>
     <div class="container">
-	<div id="freq"></div>
-	<br>
-	<div style="clear: both"></div>
-	<div id="datatable" class="table"></div>
+        <div id="freq"></div>
+        <br>
+        <div class="container" id="topics"></div>
+        <br>
+        <div style="clear: both"></div>
+        <div id="datatable" class="table"></div>
     </div>
     <script>
      JSON.flatten = function(data) {
-	 var result = {};
-	 function recurse (cur, prop) {
-	     if (Object(cur) !== cur) {
-		 result[prop] = cur;
-	     } else if (Array.isArray(cur)) {
-		 for(var i=0, l=cur.length; i<l; i++)
-		     recurse(cur[i], prop ? prop+"."+i : ""+i);
-		 if (l == 0)
-		     result[prop] = [];
-	     } else {
-		 var isEmpty = true;
-		 for (var p in cur) {
-		     isEmpty = false;
-		     recurse(cur[p], prop ? prop+"."+p : p);
-		 }
-		 if (isEmpty)
-		     result[prop] = {};
-	     }
-	 }
-	 recurse(data, "");
-	 return result;
+         var result = {};
+         function recurse (cur, prop) {
+             if (Object(cur) !== cur) {
+                 result[prop] = cur;
+             } else if (Array.isArray(cur)) {
+                 for(var i=0, l=cur.length; i<l; i++)
+                     recurse(cur[i], prop ? prop+"."+i : ""+i);
+                 if (l == 0)
+                     result[prop] = [];
+             } else {
+                 var isEmpty = true;
+                 for (var p in cur) {
+                     isEmpty = false;
+                     recurse(cur[p], prop ? prop+"."+p : p);
+                 }
+                 if (isEmpty)
+                     result[prop] = {};
+             }
+         }
+         recurse(data, "");
+         return result;
+     }
+     const getAllCommaList = (data, key) => {
+         let all = data.map( d => {
+             let dk = d[`${key}`]
+             if (dk == null){ return "" } else { return dk.split(",") }
+         })
+         let unique = [...new Set(all.flat())].filter( x => x !== "")
+         return unique
      }
 
-
-
      var chart = dc.barChart("#freq"),
-	 datatable = new dc.DataTable('#datatable');
+         datatable = new dc.DataTable('#datatable');
 
      d3.json("tor-dat.json").then((data) => {
-	 data.forEach(x => {
-	     x.num_tags = +x.num_tags;
-	     x.refresh_rate = `${x.refresh_rate}`;
-	     x.formats = `${x.formats}`;
-	 });
-	 var ndx = crossfilter(data),
-	     numTagsDim = ndx.dimension(d => +d.num_tags),
-	     numTagsSumGroup = numTagsDim.group().reduceSum(d => +d.num_tags )
+         data.forEach(x => {
+             x.num_tags = +x.num_tags;
+             x.refresh_rate = `${x.refresh_rate}`;
+             x.formats = `${x.formats}`;
+         });
+         var ndx = crossfilter(data),
+             numTagsDim = ndx.dimension(d => +d.num_tags),
+             numTagsSumGroup = numTagsDim.group().reduceSum(d => +d.num_tags ),
+             topicsDim = ndx.dimension( d => d.topics );
 
-	 dimRefreshRate = ndx.dimension(d => d.refresh_rate);
-	 dimFormats= ndx.dimension(d => d.formats);
 
-	 chart
-	     .width(768)
-	     .height(480)
-	     .x(d3.scaleBand())
-	     .xUnits(dc.units.ordinal)
-	     .brushOn(false)
-	     .dimension(dimRefreshRate)
-	     .barPadding(0.1)
-	     .outerPadding(.05)
-	     .group(dimRefreshRate.group())
-	     .xAxisLabel("Data update frequency")
-	 chart.render();
+         dimRefreshRate = ndx.dimension(d => d.refresh_rate);
+         dimFormats= ndx.dimension(d => d.formats);
 
-	 datatable
-	     .dimension(dimRefreshRate)
-	     .section(d => `${d.refresh_rate}`)
-	     .columns(['title', 'topics'])
-	     .size(data.length);
+         chart
+             .width(768)
+             .height(480)
+             .x(d3.scaleBand())
+             .xUnits(dc.units.ordinal)
+             .brushOn(false)
+             .dimension(dimRefreshRate)
+             .barPadding(0.1)
+             .outerPadding(.05)
+             .group(dimRefreshRate.group())
+             .xAxisLabel("Data update frequency")
+         chart.render();
 
-	 dc.renderAll();
+         datatable
+             .dimension(dimRefreshRate)
+             .section(d => `${d.refresh_rate}`)
+             .columns(['title', 'topics'])
+             .size(data.length);
+
+         dc.renderAll();
+
+         let allTopics = getAllCommaList(data,'topics')
+         allTopics.forEach( topic => {
+             let label = document.createElement('label')
+             let description = document.createTextNode(topic)
+             checkbox = document.createElement('input')
+             checkbox.type = 'checkbox'
+             checkbox.name = "topic"
+             checkbox.id = `${topic}`
+             checkbox.value = `${topic}`
+             label.appendChild(checkbox)
+             label.appendChild(description)
+             document.querySelector("#topics").appendChild(label)
+         })
+
+         
+         const filterTopic = (topics) => {
+             let topicSearch = RegExp(`${topics}`,'i');
+             topicsDim.filterFunction(d => {
+                 if (d){
+                  return (d.split(',').every( x => topics.includes(x)))
+                 } else {
+                  return false
+                 }
+             })
+             dc.redrawAll();
+         }
+         let topicCheckBoxes= document.querySelectorAll("input[type=checkbox][name=topic]");
+
+         let topicsStr = undefined 
+
+         console.log("before event listener")
+         topicCheckBoxes.forEach( cb => {
+             console.log("add event listener to: ",cb.value)
+             cb.addEventListener( 'change', function() {
+                 if(this.checked) {
+                     console.log(`checked ${this.value}`)
+                         console.log("topics: ",topicsStr);
+                     topicsStr ?
+                         topicsStr= [...topicsStr].concat(this.value):
+                         topicsStr= [this.value]
+                 } else {
+                         topicsStr= [...topicsStr].filter( i => i !== this.value)
+                     console.log(`unchecked ${this.value}`)
+                 }
+                     console.log(topicsStr)
+                     filterTopic(topicsStr)
+             });
+             
+         })
+         console.log("after event listener")
 
      });
     </script>
