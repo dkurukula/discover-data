@@ -17,7 +17,10 @@
     <div class="container">
         <div id="freq"></div>
         <br>
-        <div class="container" id="topics"></div>
+        <h4>Topics to include</h4>
+        <div class="container" id="topic"></div>
+        <h4>Topics to exclude</h4>
+        <div class="container" id="extopic"></div>
         <br>
         <div style="clear: both"></div>
         <div id="datatable" class="table"></div>
@@ -95,54 +98,71 @@
          dc.renderAll();
 
          let allTopics = getAllCommaList(data,'topics')
-         allTopics.forEach( topic => {
-             let label = document.createElement('label')
-             let description = document.createTextNode(topic)
-             checkbox = document.createElement('input')
-             checkbox.type = 'checkbox'
-             checkbox.name = "topic"
-             checkbox.id = `${topic}`
-             checkbox.value = `${topic}`
-             label.appendChild(checkbox)
-             label.appendChild(description)
-             document.querySelector("#topics").appendChild(label)
-         })
 
+         createTopicCheckBoxes = (name) => {
+             allTopics.forEach( topic => {
+                 let label = document.createElement('label')
+                 let description = document.createTextNode(topic)
+                 checkbox = document.createElement('input')
+                 checkbox.type = 'checkbox'
+                 checkbox.name = name 
+                 checkbox.id = `${topic}`
+                 checkbox.value = `${topic}`
+                 label.appendChild(checkbox)
+                 label.appendChild(description)
+                 document.querySelector(`#${name}`).appendChild(label)
+             })
+         }
+
+         createTopicCheckBoxes('topic')
+         createTopicCheckBoxes('extopic')
          
-         const filterTopic = (topics) => {
-             let topicSearch = RegExp(`${topics}`,'i');
+         const includesTopic = (d, topics) => topics.some(x => d.split(',').includes(x))
+         const excludesTopic = (d, topics) => !(topics.some(x => d.split(',').includes(x)))
+
+         const filterTopic = (topics, otherTopics, func, otherFunc) => {
              topicsDim.filterFunction(d => {
                  if (d){
-                  return (d.split(',').every( x => topics.includes(x)))
+                     //console.log(`in filter -- topics: ${topics}  -- d: ${d} -- func:`, func(d, topics))
+                     return func(d, topics) && otherFunc(d, otherTopics)
+                        
                  } else {
-                  return false
+                     return false 
                  }
              })
              dc.redrawAll();
          }
-         let topicCheckBoxes= document.querySelectorAll("input[type=checkbox][name=topic]");
 
-         let topicsStr = undefined 
+         let topicCheckBoxes= document.querySelectorAll("input[type=checkbox][name=topic]");
+         let extopicCheckBoxes= document.querySelectorAll("input[type=checkbox][name=extopic]");
 
          console.log("before event listener")
-         topicCheckBoxes.forEach( cb => {
-             console.log("add event listener to: ",cb.value)
-             cb.addEventListener( 'change', function() {
-                 if(this.checked) {
-                     console.log(`checked ${this.value}`)
-                         console.log("topics: ",topicsStr);
-                     topicsStr ?
-                         topicsStr= [...topicsStr].concat(this.value):
-                         topicsStr= [this.value]
-                 } else {
-                         topicsStr= [...topicsStr].filter( i => i !== this.value)
-                     console.log(`unchecked ${this.value}`)
-                 }
-                     console.log(topicsStr)
-                     filterTopic(topicsStr)
-             });
-             
-         })
+
+         const addCbEventListener = (domTopicCb, filterFunc, otherfilterFunc, topicsArr, otherTopicsArr) => {
+             domTopicCb.forEach( cb => {
+                 console.log("add event listener to: ",cb.value)
+                 cb.addEventListener( 'change', function() {
+                     if(this.checked) {
+                         console.log(`checked ${this.value}`)
+                         console.log("topics: ",topicsArr);
+                         topicsArr ?
+                         topicsArr= [...topicsArr].concat(this.value):
+                                    topicsArr= [this.value]
+                     } else {
+                         topicsArr= [...topicsArr].filter( i => i !== this.value)
+                         console.log(`unchecked ${this.value}`)
+                     }
+                     console.log(topicsArr)
+                     filterTopic(topicsArr, otherTopicsArr, filterFunc, otherfilterFunc)
+                 });
+             })
+         }
+
+         let topicsArr = []
+         let extopicsArr = []
+         addCbEventListener(topicCheckBoxes, includesTopic, excludesTopic, topicsArr, extopicsArr)
+         addCbEventListener(extopicCheckBoxes, excludesTopic, includesTopic ,extopicsArr, topicsArr)
+
          console.log("after event listener")
 
      });
