@@ -109,7 +109,7 @@
                  checkbox = document.createElement('input')
                  checkbox.type = 'checkbox'
                  checkbox.name = name 
-                 checkbox.id = `${topic}`
+                 checkbox.id = `${name}_${topic}`
                  checkbox.value = `${topic}`
                  label.appendChild(checkbox)
                  label.appendChild(description)
@@ -166,11 +166,37 @@
              return tArr
          }
 
+         const toggTopicCheckBoxes= (topicsArr) =>{
+             console.log('within togg topicCB')
+             extopicCheckBoxes.forEach( el => el.disabled = false)
+             if (topicsArr.length>0){
+                console.log('disable: ', topicsArr)
+                 topicsArr.forEach( topic => {
+                     let cb = document.getElementById(`extopic_${topic}`)
+                     console.log('cb id', cb.id)
+                    cb.disabled = true
+                 })
+             }
+         }
+         const toggexTopicCheckBoxes= (extopicsArr) =>{
+             console.log('within togg extopicCB')
+             topicCheckBoxes.forEach( el => el.disabled = false)
+             if (extopicsArr.length>0){
+                console.log('disable: ', topicsArr)
+                 extopicsArr.forEach( topic => {
+                     let cb = document.getElementById(`topic_${topic}`)
+                     console.log('cb id', cb.id)
+                    cb.disabled = true
+                 })
+             }
+         }
+
          function addCbEventListener(){
              topicCheckBoxes.forEach( cb => {
                  console.log("add event listener to: ",cb.value)
                  cb.addEventListener( 'change', function() {
                      topicsArr = updateTopicArr(this.checked, this.value, topicsArr)
+                     toggTopicCheckBoxes(topicsArr)
                      //filterTopic(topicsArr, otherTopicsArr, filterFunc, otherfilterFunc)
                      filterTopic(topicsArr, extopicsArr)
                  });
@@ -182,12 +208,12 @@
                  console.log("add event listener to: ",cb.value)
                  cb.addEventListener( 'change', function() {
                      extopicsArr = updateTopicArr(this.checked, this.value, extopicsArr)
+                     toggexTopicCheckBoxes(extopicsArr)
                      //filterTopic(topicsArr, otherTopicsArr, filterFunc, otherfilterFunc)
                      filterTopic(topicsArr, extopicsArr)
                  });
              })
          }
-
 
          addCbEventListener()
          addexCbEventListener()
