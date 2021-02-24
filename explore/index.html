@@ -1,16 +1,35 @@
 
 <!DOCTYPE html>
 <head>
-<meta charset="utf-8">
-<link rel="stylesheet" type="text/css" href="https://unpkg.com/dc@4/dist/style/dc.css" />
-<script src="https://unpkg.com/d3@5/dist/d3.js"></script>
-<script src="https://unpkg.com/crossfilter2@1.5/crossfilter.js"></script>
-<script src="https://unpkg.com/dc@4/dist/dc.js"></script>
-<script src="https://rawgit.com/crossfilter/reductio/master/reductio.js"></script>
-<script src="https://npmcdn.com/universe@latest/universe.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
-<style>
-</style>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/dc@4/dist/style/dc.css" />
+    <script src="https://unpkg.com/d3@5/dist/d3.js"></script>
+    <script src="https://unpkg.com/crossfilter2@1.5/crossfilter.js"></script>
+    <script src="https://unpkg.com/dc@4/dist/dc.js"></script>
+    <script src="https://rawgit.com/crossfilter/reductio/master/reductio.js"></script>
+    <script src="https://npmcdn.com/universe@latest/universe.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <style>
+     input[type=checkbox] {
+         position: relative;
+         width: 1.25em;
+         height: 1.25em;
+         color: #363839;
+         border: 1px solid #bdc1c6;
+         padding: .25em;
+         margin: 0.25em;
+         margin-left: 0.75em;
+     }
+     label {
+         position: relative;
+         cursor: pointer;
+         font-size: 1.25em;
+         top: 50%;
+         font-weight: 200;
+         padding-bottom:.5em;
+     }
+
+    </style>
 </head>
 
 <body>
@@ -111,6 +130,7 @@
                  checkbox.name = name 
                  checkbox.id = `${name}_${topic}`
                  checkbox.value = `${topic}`
+                 checkbox.class = 'btn-check'
                  label.appendChild(checkbox)
                  label.appendChild(description)
                  document.querySelector(`#${name}`).appendChild(label)
@@ -170,11 +190,11 @@
              console.log('within togg topicCB')
              extopicCheckBoxes.forEach( el => el.disabled = false)
              if (topicsArr.length>0){
-                console.log('disable: ', topicsArr)
+                 console.log('disable: ', topicsArr)
                  topicsArr.forEach( topic => {
                      let cb = document.getElementById(`extopic_${topic}`)
                      console.log('cb id', cb.id)
-                    cb.disabled = true
+                     cb.disabled = true
                  })
              }
          }
@@ -182,11 +202,11 @@
              console.log('within togg extopicCB')
              topicCheckBoxes.forEach( el => el.disabled = false)
              if (extopicsArr.length>0){
-                console.log('disable: ', topicsArr)
+                 console.log('disable: ', topicsArr)
                  extopicsArr.forEach( topic => {
                      let cb = document.getElementById(`topic_${topic}`)
                      console.log('cb id', cb.id)
-                    cb.disabled = true
+                     cb.disabled = true
                  })
              }
          }
