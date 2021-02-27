@@ -34,8 +34,10 @@
 
 <body>
     <div class="container">
+        <h2>Toronto Open Data</h2>
         <div id="freq"></div>
         <br>
+        <a href="#">reset</a>
         <h4>Topics to include</h4>
         <div class="container" id="topic"></div>
         <h4>Topics to exclude</h4>
@@ -45,6 +47,11 @@
         <div id="datatable" class="table"></div>
     </div>
     <script>
+
+     const TOPICS = 'topics'
+     const EXTOPICS = 'extopics'
+     const TOPICS_CB = 'topics_chekcboxes'
+     const EXTOPICS_CB = 'extopics_chekcboxes'
 
      JSON.flatten = function(data) {
          var result = {};
@@ -140,8 +147,11 @@
          createTopicCheckBoxes('topic')
          createTopicCheckBoxes('extopic')
 
-         var topicsArr = []
-         var extopicsArr = []
+         const state = {}
+         state[TOPICS] = []
+         state[EXTOPICS] = []
+         state[TOPICS_CB] = document.querySelectorAll("input[type=checkbox][name=topic]");
+         state[EXTOPICS_CB]= document.querySelectorAll("input[type=checkbox][name=extopic]");
          
          const includesTopic = (d, topics) => {
              return topics.some(x => d.split(',').includes(x))
@@ -151,15 +161,10 @@
              return d.split(',').filter(x => topics.includes(x)).length===0
          }
 
-         const filterTopic = (topicsArr, extopicsArr) => {
-             //console.log('filter func:', includesTopic.name)
-             //console.log('topics: ', topicsArr)
-             //console.log('filter other func:', excludesTopic.name)
-             //console.log('other topics: ', extopicsArr)
+         const filterTopic = (state) => {
              topicsDim.filterFunction(d => {
                  if (d){
-                     //console.log(`in filter -- topics: ${topics}  -- d: ${d} -- func:`, func(d, topics))
-                     return (includesTopic(d, topicsArr) && excludesTopic(d, extopicsArr))
+                     return (includesTopic(d, state[TOPICS]) && excludesTopic(d, state[EXTOPICS]))
                  } else {
                      return false 
                  }
@@ -167,70 +172,46 @@
              dc.redrawAll();
          }
          
-         let topicCheckBoxes= document.querySelectorAll("input[type=checkbox][name=topic]");
-         let extopicCheckBoxes= document.querySelectorAll("input[type=checkbox][name=extopic]");
 
          console.log("before event listener")
 
-         const updateTopicArr = (checked, val, tArr) => {
+         const updateTopicArr = (checked, val, state, key) => {
              if(checked) {
-                 console.log(`checked ${val}`)
-                 tArr ?
-                 tArr= [...tArr].concat(val):
-                       tArr= [val]
+                 state[key] ? state[key]= [...state[key]].concat(val): state[key]= [val]
              } else {
-                 tArr= [...tArr].filter( i => i !== val)
-                 console.log(`unchecked ${val}`)
+                 state[key]= [...state[key]].filter( i => i !== val)
              }
-             console.log("topics: ",tArr);
-             return tArr
+             return state[key]
          }
 
-         const toggTopicCheckBoxes= (topicsArr) =>{
-             console.log('within togg topicCB')
-             extopicCheckBoxes.forEach( el => el.disabled = false)
-             if (topicsArr.length>0){
-                 console.log('disable: ', topicsArr)
-                 topicsArr.forEach( topic => {
-                     let cb = document.getElementById(`extopic_${topic}`)
-                     console.log('cb id', cb.id)
-                     cb.disabled = true
-                 })
-             }
-         }
-         const toggexTopicCheckBoxes= (extopicsArr) =>{
-             console.log('within togg extopicCB')
-             topicCheckBoxes.forEach( el => el.disabled = false)
-             if (extopicsArr.length>0){
-                 console.log('disable: ', topicsArr)
-                 extopicsArr.forEach( topic => {
-                     let cb = document.getElementById(`topic_${topic}`)
-                     console.log('cb id', cb.id)
-                     cb.disabled = true
+         const toggCheckBoxes= (state, key, keyCbToDisable) =>{
+             state[keyCbToDisable].forEach( el => el.disabled = false)
+             if (state[key].length>0){
+                 state[key].forEach( topic => {
+                     state[keyCbToDisable].forEach( cb => {
+                         if (cb.value === topic)
+                             cb.disabled = true
+                     })
                  })
              }
          }
 
          function addCbEventListener(){
-             topicCheckBoxes.forEach( cb => {
-                 console.log("add event listener to: ",cb.value)
+             state[TOPICS_CB].forEach( cb => {
                  cb.addEventListener( 'change', function() {
-                     topicsArr = updateTopicArr(this.checked, this.value, topicsArr)
-                     toggTopicCheckBoxes(topicsArr)
-                     //filterTopic(topicsArr, otherTopicsArr, filterFunc, otherfilterFunc)
-                     filterTopic(topicsArr, extopicsArr)
+                     state[TOPICS] = updateTopicArr(this.checked, this.value, state, TOPICS)
+                     toggCheckBoxes(state, TOPICS, EXTOPICS_CB)
+                     filterTopic(state)
                  });
              })
          }
 
-         function addexCbEventListener(domTopicCb, ){
-             extopicCheckBoxes.forEach( cb => {
-                 console.log("add event listener to: ",cb.value)
+         function addexCbEventListener(){
+             state[EXTOPICS_CB].forEach( cb => {
                  cb.addEventListener( 'change', function() {
-                     extopicsArr = updateTopicArr(this.checked, this.value, extopicsArr)
-                     toggexTopicCheckBoxes(extopicsArr)
-                     //filterTopic(topicsArr, otherTopicsArr, filterFunc, otherfilterFunc)
-                     filterTopic(topicsArr, extopicsArr)
+                     state[EXTOPICS] = updateTopicArr(this.checked, this.value, state, EXTOPICS)
+                     toggCheckBoxes(state, EXTOPICS, TOPICS_CB)
+                     filterTopic(state)
                  });
              })
          }
